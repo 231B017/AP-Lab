@@ -1,108 +1,119 @@
-## ✔️ a) Design Principle
+### **Short Question**
 
-**Dependency Inversion Principle (DIP)**
-
-**Complete Statement:**
-High-level modules should not depend on low-level modules. Both should depend on abstractions.
-Abstractions should not depend on details; details should depend on abstractions.
-
-👉 Here:
-
-* `Document` (high-level) should **not directly depend on Page implementation**
-* `Page` should not call `Document`
-* Both interact via an **abstraction (interface)**
+Design a word processor with `Document` (high-level) and `Page` (low-level) such that `Page` does not call `Document`, and `Document` triggers page re-rendering.
 
 ---
 
-## ✔️ b) Class Diagram (Textual UML)
+## **Solution**
 
-```id="klm921"
-        <<interface>>
-          Page
-            ^
-            |
-      -----------------
-      |               |
-  TextPage      ImagePage
+### **a) Design Principle**
+
+**Dependency Inversion Principle (DIP)**
+*High-level modules should not depend on low-level modules. Both should depend on abstractions. Abstractions should not depend on details; details should depend on abstractions.*
+
+---
+
+### **b) Class Diagram (Detailed)**
+
+```
++----------------------+
+|     <<interface>>    |
+|       Renderer       |
++----------------------+
+| + render() : void    |
++----------^-----------+
+           |
+           |
++----------------------+
+|        Page          |
++----------------------+
+| - content : String   |
++----------------------+
+| + Page(content)      |
+| + render() : void    |
++----------------------+
 
 
-          Document
-            |
-      uses (has list of)
-            |
-          Page
++-----------------------------------+
+|             Document              |
++-----------------------------------+
+| - pages : List<Renderer>          |
++-----------------------------------+
+| + addPage(r : Renderer) : void    |
+| + updateDocument() : void         |
++-----------------------------------+
+
+Relationship:
+Document "has-a" List of Renderer (Aggregation)
+Page "implements" Renderer
 ```
 
 ---
 
-## ✔️ c) Implementation (Java)
+### **c) Implementation (Java)**
 
-```java id="abc482"
+```java
 import java.util.*;
 
 // Abstraction
-interface Page {
+interface Renderer {
     void render();
 }
 
-// Concrete Pages
-class TextPage implements Page {
-    public void render() {
-        System.out.println("Rendering Text Page");
-    }
-}
+// Low-level module
+class Page implements Renderer {
+    private String content;
 
-class ImagePage implements Page {
+    Page(String content) {
+        this.content = content;
+    }
+
     public void render() {
-        System.out.println("Rendering Image Page");
+        System.out.println("Rendering page: " + content);
     }
 }
 
 // High-level module
 class Document {
-    private List<Page> pages = new ArrayList<>();
+    private List<Renderer> pages = new ArrayList<>();
 
-    public void addPage(Page page) {
+    public void addPage(Renderer page) {
         pages.add(page);
     }
 
-    // When document changes, it tells pages to re-render
-    public void renderDocument() {
-        System.out.println("Document changed. Re-rendering all pages...");
-        for (Page p : pages) {
+    public void updateDocument() {
+        System.out.println("Document updated. Re-rendering pages...");
+        for (Renderer p : pages) {
             p.render();
         }
     }
 }
 
-// Client
+// Main class
 public class Main {
     public static void main(String[] args) {
         Document doc = new Document();
 
-        doc.addPage(new TextPage());
-        doc.addPage(new ImagePage());
+        doc.addPage(new Page("Page 1 Content"));
+        doc.addPage(new Page("Page 2 Content"));
 
-        doc.renderDocument();
+        doc.updateDocument();
     }
 }
 ```
 
 ---
 
-## ✔️ Output
+### **Output**
 
-```id="out562"
-Document changed. Re-rendering all pages...
-Rendering Text Page
-Rendering Image Page
+```
+Document updated. Re-rendering pages...
+Rendering page: Page 1 Content
+Rendering page: Page 2 Content
 ```
 
 ---
 
-## ✔️ Key Points
+### **Summary**
 
-* ❌ `Page` does NOT call `Document`
-* ✅ `Document` controls updates
-* ✅ Loose coupling via interface
-* ✅ Easy to extend (new Page types without changing Document)
+The improved diagram clearly shows abstraction (`Renderer`), implementation (`Page`), and dependency (`Document → Renderer`). This ensures loose coupling and correct dependency direction as per DIP.
