@@ -1,36 +1,63 @@
-Your earlier DIP answer was fine. Now for this **Strategy Pattern case**, here’s a clean, exam-ready solution that fully matches all requirements.
+### **Short Question**
+
+Design a payment processing system using the **Strategy Design Pattern** that supports Credit Card, UPI, and PayPal, allowing runtime selection of payment method.
 
 ---
 
-# ✔️ Strategy Design Pattern – Payment System
+## **Solution**
+
+### **a) Intent (Strategy Pattern)**
+
+Define a family of algorithms, encapsulate each one, and make them interchangeable so that the algorithm can vary independently from the client.
 
 ---
 
-## 🔹 Brief Explanation
+### **b) Class Diagram (Detailed)**
 
-The **Strategy Pattern** defines a family of algorithms (payment methods), encapsulates each one, and makes them interchangeable at runtime.
+```id="stp983"
+          +-----------------------------+
+          |     <<interface>>           |
+          |     PaymentStrategy         |
+          +-----------------------------+
+          | + processPayment(amount)    |
+          +-------------^---------------+
+                        |
+      -----------------------------------------
+      |                  |                    |
++----------------+ +----------------+ +------------------+
+| CreditCardPay  | |   UPIPayment   | |  PayPalPayment   |
++----------------+ +----------------+ +------------------+
+| +processPayment| | +processPayment| | +processPayment  |
++----------------+ +----------------+ +------------------+
 
-👉 Here:
 
-* Each payment method = a **strategy**
-* User selects strategy dynamically
-* No change in client (`PaymentContext`)
+            +------------------------------+
+            |       PaymentContext         |
+            +------------------------------+
+            | - strategy: PaymentStrategy  |
+            +------------------------------+
+            | + setStrategy(s)             |
+            | + pay(amount)                |
+            +------------------------------+
 
----
-
-## ✔️ a) Strategy Interface
-
-```java
-interface PaymentStrategy {
-    void processPayment(int amount);
-}
+Relationship:
+PaymentContext "has-a" PaymentStrategy
+Concrete strategies "implement" PaymentStrategy
 ```
 
 ---
 
-## ✔️ b) Concrete Strategies
+### **c) Implementation (Java)**
 
-```java
+```java id="pay873"
+import java.util.Scanner;
+
+// Strategy Interface
+interface PaymentStrategy {
+    void processPayment(int amount);
+}
+
+// Concrete Strategies
 class CreditCardPayment implements PaymentStrategy {
     public void processPayment(int amount) {
         System.out.println("Processing Rs." + amount + " via Credit Card");
@@ -48,13 +75,8 @@ class PayPalPayment implements PaymentStrategy {
         System.out.println("Processing Rs." + amount + " via PayPal");
     }
 }
-```
 
----
-
-## ✔️ c) Context Class
-
-```java
+// Context Class
 class PaymentContext {
     private PaymentStrategy strategy;
 
@@ -66,15 +88,8 @@ class PaymentContext {
         strategy.processPayment(amount);
     }
 }
-```
 
----
-
-## ✔️ d) Main Class (Runtime Selection)
-
-```java
-import java.util.Scanner;
-
+// Main Class
 public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
@@ -88,7 +103,7 @@ public class Main {
 
         int choice = sc.nextInt();
 
-        switch(choice) {
+        switch (choice) {
             case 1:
                 context.setStrategy(new CreditCardPayment());
                 break;
@@ -110,9 +125,9 @@ public class Main {
 
 ---
 
-## ✔️ Sample Output
+### **Output (Sample Run)**
 
-```
+```id="out992"
 Enter amount: 1000
 Select Payment Method:
 1. Credit Card  2. UPI  3. PayPal
@@ -122,21 +137,15 @@ Processing Rs.1000 via UPI Payment
 
 ---
 
-## ✔️ How Strategy Pattern is Applied
+### **Brief Explanation**
 
-* `PaymentStrategy` → common interface
-* `CreditCardPayment`, `UPIPayment`, `PayPalPayment` → interchangeable strategies
-* `PaymentContext` → uses strategy (composition, not inheritance)
-* Runtime selection via user input
-
----
-
-## ✔️ Key Benefits
-
-* ✅ Easy to add new payment methods
-* ✅ No modification in existing code (Open/Closed Principle)
-* ✅ Clean separation of logic
+* `PaymentStrategy` defines a common interface.
+* Each payment method implements its own strategy.
+* `PaymentContext` uses a strategy but is independent of its implementation.
+* Strategy can be changed at runtime → ensures flexibility and loose coupling.
 
 ---
 
-If you want, I can also convert this into a **short handwritten-style answer (for exams)** or add a **class diagram**.
+### **Summary**
+
+The Strategy Pattern cleanly separates payment algorithms and allows dynamic switching, making the system scalable and maintainable.
