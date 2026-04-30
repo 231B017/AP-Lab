@@ -1,78 +1,61 @@
-Your earlier answer was on the right track, but let’s tighten it so it fully matches the question (intent + clear mapping to problem + diagram + working program).
+### **Short Question**
+
+Design a system for Golgappa Stalls where each franchise (Mumbai, Jaipur) produces its own regional-style panipuri using the **Factory Method Pattern**, instead of relying on a central factory.
 
 ---
 
-# ✔️ Design Pattern: **Factory Method Pattern**
+## **Solution**
+
+### **Intent (Factory Method Pattern)**
+
+Define an interface for creating an object, but let subclasses decide which class to instantiate. This allows each franchise to produce its own style of golgappa independently.
 
 ---
 
-## 🔹 Intent
-
-The **Factory Method Pattern** defines an interface for creating objects, but allows subclasses to decide which class to instantiate. It lets a class defer instantiation to subclasses.
-
-👉 In this case:
-Each franchise (Mumbai, Jaipur) will **create its own golgappas locally**, instead of depending on a central factory.
-
----
-
-## 🔹 Mapping to Problem
-
-* **Product** → Golgappa
-* **Concrete Products** → MumbaiStyleGolgappa, JaipurStyleGolgappa
-* **Creator (Factory)** → GolgappaFactory
-* **Concrete Creators** → MumbaiFactory, JaipurFactory
-
-✔️ Each franchise has its **own factory**, solving distance & quality issues.
-
----
-
-## 🔹 Class Diagram (Textual UML)**
+### **Class Diagram (Textual)**
 
 ```
-                <<interface>>
-                  Golgappa
-                      |
-        -----------------------------
-        |                           |
-MumbaiStyleGolgappa     JaipurStyleGolgappa
+          Golgappa (Product - Interface)
+                ↑
+   -----------------------------
+   |                           |
+MumbaiGolgappa        JaipurGolgappa
 
-
-            <<abstract>>
-           GolgappaFactory
-                 |
-        ----------------------
-        |                    |
-  MumbaiFactory        JaipurFactory
+        GolgappaFactory (Creator - Abstract)
+                  ↑
+     --------------------------------
+     |                              |
+MumbaiFactory              JaipurFactory
 ```
 
 ---
 
-## 🔹 Program (Java)
+### **Program (Java Example)**
 
 ```java
-// Product
+// Product Interface
 interface Golgappa {
     void prepare();
 }
 
 // Concrete Products
-class MumbaiStyleGolgappa implements Golgappa {
+class MumbaiGolgappa implements Golgappa {
     public void prepare() {
         System.out.println("Preparing spicy Mumbai style Golgappa");
     }
 }
 
-class JaipurStyleGolgappa implements Golgappa {
+class JaipurGolgappa implements Golgappa {
     public void prepare() {
-        System.out.println("Preparing tangy Jaipur style Golgappa");
+        System.out.println("Preparing sweet Jaipur style Golgappa");
     }
 }
 
-// Creator (Factory)
+// Creator Abstract Class
 abstract class GolgappaFactory {
     abstract Golgappa createGolgappa();
 
-    public void serveGolgappa() {
+    public void serve() {
         Golgappa g = createGolgappa();
         g.prepare();
     }
@@ -81,47 +64,39 @@ abstract class GolgappaFactory {
 // Concrete Factories
 class MumbaiFactory extends GolgappaFactory {
     Golgappa createGolgappa() {
-        return new MumbaiStyleGolgappa();
+        return new MumbaiGolgappa();
     }
 }
 
 class JaipurFactory extends GolgappaFactory {
     Golgappa createGolgappa() {
-        return new JaipurStyleGolgappa();
+        return new JaipurGolgappa();
     }
 }
 
-// Client
+// Main Class
 public class Main {
     public static void main(String[] args) {
+        GolgappaFactory mumbai = new MumbaiFactory();
+        GolgappaFactory jaipur = new JaipurFactory();
 
-        GolgappaFactory mumbaiFranchise = new MumbaiFactory();
-        GolgappaFactory jaipurFranchise = new JaipurFactory();
-
-        mumbaiFranchise.serveGolgappa();
-        jaipurFranchise.serveGolgappa();
+        mumbai.serve();
+        jaipur.serve();
     }
 }
 ```
 
 ---
 
-## 🔹 Output
+### **Output**
 
 ```
 Preparing spicy Mumbai style Golgappa
-Preparing tangy Jaipur style Golgappa
+Preparing sweet Jaipur style Golgappa
 ```
 
 ---
 
-## 🔹 Why this solves the problem
+### **Summary**
 
-* ❌ No centralized factory dependency
-* ✅ Each franchise produces locally
-* ✅ Easy to add new franchises (e.g., DelhiFactory)
-* ✅ Maintains regional customization
-
----
-
-This version directly addresses the **real-world scenario, pattern intent, structure, and implementation**, so it fully satisfies the question.
+Each franchise now has its own factory, ensuring regional customization and eliminating dependency on a central factory—perfect use of the Factory Method Pattern.
